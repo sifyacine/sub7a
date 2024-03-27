@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,10 +11,55 @@ class HomePage extends StatefulWidget {
 
 
 class _HomePageState extends State<HomePage> {
+
+  resetToZero({bool resetGoal = false}){
+    setCounter(_counter = 0);
+    setAttempts(_attempts = 0);
+    resetGoal ? setGoal(_goal = 1): null;
+  }
+  setCounter(int value) async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("counter", value);
+    getCounter();
+  }
+
+  setAttempts(int value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("attempts", value);
+  }
+  setGoal(int value) async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("goal", value);
+    getCounter();
+  }
+  setColor(int value) async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("color", value);
+    getCounter();
+  }
+
+  getCounter() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = prefs.getInt("counter")?? 0;
+      _attempts = prefs.getInt("attempts")?? 0;
+      _goal = prefs.getInt("goal")?? 0;
+      colorHex = prefs.getInt("color") ?? 0xFFB1001C;
+
+    });
+  }
+  @override
+  void initState() {
+    getCounter();
+    super.initState();
+  }
   int rad = 0;
   int colorHex = 0xFFB1001C;
   int _counter = 0;
   int _attempts = 0;
+  int _goal = 1;
+  bool isActive = false;
+
   @override
   Widget build(BuildContext context) {
     Color mainColor = Color(colorHex);
@@ -22,7 +68,9 @@ class _HomePageState extends State<HomePage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: (){},
+          onPressed: (){
+            resetToZero(resetGoal: true);
+          },
           backgroundColor: mainColor,
           child: Icon(Icons.refresh),
         ),
@@ -30,12 +78,21 @@ class _HomePageState extends State<HomePage> {
           elevation: 0,
           backgroundColor: mainColor,
           actions: [
-            IconButton(
-                onPressed: (){},
-                icon: Icon(
-                  Icons.color_lens,
-                ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: GestureDetector(
+                onTap:(){
+                  setState(() {
+                    isActive = !isActive;
+                    },
+                  );
+                  },
+                child: Icon(
+                      isActive ? Icons. color_lens_outlined : Icons.color_lens,
+                    ),
+              ),
             ),
+
           ],
         ),
         body: Column(
@@ -61,21 +118,32 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            resetToZero(resetGoal: false);
+                            setGoal(_goal + 1);
+                          },
                           icon: Icon(
                               Icons.add_circle,
                             color: Colors.white,
                           ),
-                      ),Text(
-                        "34",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
+                      ),Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "$_goal",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                          ),
                         ),
                       ),
                       IconButton(
                         onPressed: (){
-
+                          resetToZero(resetGoal: false);
+                          if (_goal != 0){
+                            setGoal(_goal - 1);
+                          } else {
+                            setGoal(_goal = _goal);
+                          }
                         },
                         icon: Icon(
                           color: Colors.white,
@@ -87,64 +155,94 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12)
-                        ),
-                        child: Text(
-                          "0",
+                      GestureDetector(
+                        onTap:(){
+                          resetToZero();
+                          setGoal(_goal = 1);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12)
+                          ),
+                          child: Text(
+                            "1",
 
+                          ),
                         ),
                       ),
                       SizedBox(width: 8,),
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12)
-                        ),
-                        child: Text(
-                          '33',
+                      GestureDetector(
+                        onTap:(){
+                          resetToZero();
+                          setGoal(_goal = 33);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12)
+                          ),
+                          child: Text(
+                            '33',
 
+                          ),
                         ),
                       ),
                       SizedBox(width: 8,),
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12)
-                        ),
-                        child: Text(
-                          "100",
+                      GestureDetector(
+                        onTap:(){
+                          resetToZero();
+                          setGoal(_goal = 100);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12)
+                          ),
+                          child: Text(
+                            "100",
 
+                          ),
                         ),
                       ), SizedBox(width: 8,),
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12)
-                        ),
-                        child: Text(
-                          "+100",
+                      GestureDetector(
+                        onTap:(){
+                          resetToZero();
+                          setGoal(_goal = _goal+ 100);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12)
+                          ),
+                          child: Text(
+                            "+100",
 
+                          ),
                         ),
                       ),
                       SizedBox(
                         width: 8,
                       ),
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12)
-                        ),
-                        child: Text(
-                          "+1000",
+                      GestureDetector(
+                        onTap:(){
+                          resetToZero();
+                          setGoal(_goal = _goal+ 1000);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12)
+                          ),
+                          child: Text(
+                            "+1000",
 
+                          ),
                         ),
                       ),
                     ],
@@ -173,15 +271,17 @@ class _HomePageState extends State<HomePage> {
                 CircularPercentIndicator(
                   radius: 75.0,
                   lineWidth: 5.0,
-                  percent: _counter/33,
+                  percent: _counter/_goal,
                   center: GestureDetector(
                     onTap: (){
                       setState(() {
-                        if(_counter == 33){
-                          _attempts++;
-                          _counter = 0;
+                        if(_counter >= _goal){
+                          setAttempts(_attempts + 1);
+                          setCounter(_counter = 1);
                         }
-                        _counter++;
+                        else{
+                          setCounter(_counter + 1);
+                        }
                       });
                     },
                     child: Icon(
@@ -203,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 10,),
                 Text(
-                  "total : 90",
+                  "total : ${_attempts*_goal + _counter}",
                   style: TextStyle(
                     color: mainColor,
                     fontSize: 22,
@@ -214,13 +314,16 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(12),
-                  child: Row(
-                     children: [
-                       Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFFB1001C)), value: 0xFFB1001C, groupValue: colorHex, onChanged: (val){setState(() {colorHex = val!;});},),
-                       Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF14212A)), value: 0xFF14212A, groupValue: colorHex, onChanged: (val){setState(() {colorHex = val!;});},),
-                       Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF62249F)), value: 0xFF62249F, groupValue: colorHex, onChanged: (val){setState(() {colorHex = val!;});},),
+                  child: Visibility(
+                    visible: isActive,
+                    child: Row(
+                       children: [
+                         Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFFB1001C)), value: 0xFFB1001C, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
+                         Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF14212A)), value: 0xFF14212A, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
+                         Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF62249F)), value: 0xFF62249F, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
 
-                     ],
+                       ],
+                    ),
                   ),
                 ),
               ],
