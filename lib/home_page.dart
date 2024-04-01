@@ -321,6 +321,7 @@ class _HomePageState extends State<HomePage> {
                          Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFFB1001C)), value: 0xFFB1001C, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
                          Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF14212A)), value: 0xFF14212A, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
                          Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF62249F)), value: 0xFF62249F, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
+                         Radio(fillColor: MaterialStateColor.resolveWith((states) => Color(0xFFeb346e)), value: 0xFFeb346e, groupValue: colorHex, onChanged: (val){setState(() {setColor(val!);});},),
 
                        ],
                     ),
